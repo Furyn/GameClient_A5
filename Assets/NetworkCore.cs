@@ -1,3 +1,4 @@
+using ENet;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -6,6 +7,7 @@ using UnityEngine;
 public class NetworkCore : MonoBehaviour
 {
     ENet.Host m_enetHost = new ENet.Host();
+    Peer peer;
 
     public bool Connect(string addressString)
     {
@@ -15,8 +17,14 @@ public class NetworkCore : MonoBehaviour
 
         address.Port = 14768;
 
-        m_enetHost.Connect(address, 0);
+        peer = m_enetHost.Connect(address, 0);
         return true;
+    }
+
+    public void Disconnect()
+    {
+        peer.Disconnect(0);
+        m_enetHost.Flush();
     }
 
     // Start is called before the first frame update
@@ -34,6 +42,7 @@ public class NetworkCore : MonoBehaviour
     }
     private void OnApplicationQuit()
     {
+        Disconnect();
         ENet.Library.Deinitialize();
     }
 
