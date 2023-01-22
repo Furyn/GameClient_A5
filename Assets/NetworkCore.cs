@@ -4,11 +4,13 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using UnityEngine;
+using TMPro;
 
 public class NetworkCore : MonoBehaviour
 {
     ENet.Host m_enetHost = new ENet.Host();
     Peer peer;
+    public TMP_InputField ipField;
 
     public bool Connect(string addressString)
     {
@@ -18,8 +20,19 @@ public class NetworkCore : MonoBehaviour
 
         address.Port = 14768;
 
+        m_enetHost.Create(1, 0);
         peer = m_enetHost.Connect(address, 0);
         return true;
+    }
+
+    public void ConnectLocalhostButton()
+    {
+        Connect("localhost");
+    }
+
+    public void ConnectWithIPInput()
+    {
+        Connect(ipField.text);
     }
 
     public void Disconnect()
@@ -35,11 +48,6 @@ public class NetworkCore : MonoBehaviour
             throw new Exception("Failed to initialize ENet");
 
         DontDestroyOnLoad(this.gameObject);
-
-        m_enetHost.Create(1, 0);
-
-        // Ne laissez pas le Connect ici (un écran de connexion est si vite arrivé)
-        Connect("localhost");
     }
     private void OnApplicationQuit()
     {
@@ -50,6 +58,9 @@ public class NetworkCore : MonoBehaviour
     // Update is called once per frame
     void FixedUpdate()
     {
+        if (!peer.IsSet)
+            return;
+
         ENet.Event evt = new ENet.Event();
         if (m_enetHost.Service(0, out evt) > 0)
         {
@@ -63,6 +74,21 @@ public class NetworkCore : MonoBehaviour
 
                     case ENet.EventType.Connect:
                         Debug.Log("Connect");
+                        //SERIALISATION TEST
+                        byte[] data = new byte[0];
+                        int offset = 0;
+                        string str = "THE WORLD !";
+
+                        Serialize_u32(ref data, 42);
+                        SerializeString(ref data, str);
+
+                        Packet packet = default(Packet);
+
+                        packet.Create(data);
+                        peer.Send(0, ref packet);
+
+                        //Debug.Log(Unserialize_u32(ref data, ref offset));
+                        //Debug.Log(Unserialize_str(ref data, ref offset));
                         break;
 
                     case ENet.EventType.Disconnect:
