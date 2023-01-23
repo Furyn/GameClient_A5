@@ -87,6 +87,8 @@ public class NetworkCore : MonoBehaviour
                         packet.Create(data);
                         peer.Send(0, ref packet);
 
+                        packet.Dispose();
+
                         //Debug.Log(Unserialize_u32(ref data, ref offset));
                         //Debug.Log(Unserialize_str(ref data, ref offset));
                         break;
@@ -96,7 +98,15 @@ public class NetworkCore : MonoBehaviour
                         break;
 
                     case ENet.EventType.Receive:
-                        Debug.Log("Receive");
+                        byte[] dataPacket = new byte[evt.Packet.Length];
+                        evt.Packet.CopyTo(dataPacket);
+
+                        int offset = 0;
+                        int i = Unserialize_u32(ref dataPacket, ref offset);
+                        string str2 = Unserialize_str(ref dataPacket, ref offset);
+
+                        Debug.Log(i + " " + str2);
+                        evt.Packet.Dispose();
                         break;
 
                     case ENet.EventType.Timeout:
@@ -169,7 +179,7 @@ public class NetworkCore : MonoBehaviour
         Serialize_u32(ref byteArray, offset ,value.Length);
         offset += sizeof(int);
 
-        byte[] valueByte = System.Text.Encoding.ASCII.GetBytes(value);
+        byte[] valueByte = Encoding.ASCII.GetBytes(value);
 
         for (int i = 0; i < value.Length; i++)
         {
