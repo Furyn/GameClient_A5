@@ -4,9 +4,10 @@ public class C_PlayerName : GeneriqueOpCode
 {
     public string name;
 
-    public C_PlayerName()
+    public C_PlayerName(string name = "")
     {
         opCode = EnetOpCode.OpCode.C_PlayerName;
+        this.name = name;
     }
 
     public override void Serialize(ref byte[] byteArray)

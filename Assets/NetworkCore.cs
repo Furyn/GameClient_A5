@@ -79,12 +79,8 @@ public class NetworkCore : MonoBehaviour
 
                         byte[] data = new byte[0];
 
-                        C_PlayerName packetPlayerName = new C_PlayerName();
-                        packetPlayerName.name = "Test";
-
-                        GeneriqueOpCode g = packetPlayerName;
-
-                        Packet packet = build_packet(ref g, PacketFlags.None);
+                        GeneriqueOpCode packet_to_send = new C_PlayerName("Test");
+                        Packet packet = build_packet(ref packet_to_send, PacketFlags.None);
 
                         peer.Send(0, ref packet);
 
