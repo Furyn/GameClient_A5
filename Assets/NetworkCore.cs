@@ -74,23 +74,21 @@ public class NetworkCore : MonoBehaviour
 
                     case ENet.EventType.Connect:
                         Debug.Log("Connect");
+
                         //SERIALISATION TEST
+
                         byte[] data = new byte[0];
-                        int offset = 0;
-                        string str = "THE WORLD !";
 
-                        Serialize_u32(ref data, 42);
-                        SerializeString(ref data, str);
+                        C_PlayerName packetPlaerName = new C_PlayerName();
+                        packetPlaerName.name = "Test";
 
-                        Packet packet = default(Packet);
+                        GeneriqueOpCode g = packetPlaerName;
 
-                        packet.Create(data);
-                        peer.Send(0, ref packet);
+                        Packet packet = build_packet(ref g, PacketFlags.None);
+
+                        peer.Send(0,ref packet);
 
                         packet.Dispose();
-
-                        //Debug.Log(Unserialize_u32(ref data, ref offset));
-                        //Debug.Log(Unserialize_str(ref data, ref offset));
                         break;
 
                     case ENet.EventType.Disconnect:
@@ -101,11 +99,8 @@ public class NetworkCore : MonoBehaviour
                         byte[] dataPacket = new byte[evt.Packet.Length];
                         evt.Packet.CopyTo(dataPacket);
 
-                        int offset = 0;
-                        int i = Unserialize_u32(ref dataPacket, ref offset);
-                        string str2 = Unserialize_str(ref dataPacket, ref offset);
+                        handle_message(dataPacket, evt);
 
-                        Debug.Log(i + " " + str2);
                         evt.Packet.Dispose();
                         break;
 
@@ -118,12 +113,31 @@ public class NetworkCore : MonoBehaviour
         }
     }
 
+    private void handle_message(byte[] dataPacket, ENet.Event evt)
+    {
+        int offset = 0;
+        EnetOpCode.OpCode opcode = (EnetOpCode.OpCode)Unserialize_u32(ref dataPacket, ref offset);
+
+        switch (opcode)
+        {
+            case EnetOpCode.OpCode.C_PlayerName:
+                C_PlayerName playerName = new C_PlayerName(); 
+                playerName.Unserialize(ref dataPacket, offset);
+                Debug.Log(playerName.name);
+                break;
+
+            default:
+                break;
+        }
+
+    }
+
     public static String DisplayBinary(Byte[] data)
     {
         return string.Join(" ", data.Select(byt => Convert.ToString(byt, 2).PadLeft(8, '0')));
     }
 
-#region Int Serialisation
+    #region Int Serialisation
     public static void Serialize_u32(ref byte[] byteArray, Int32 value)
     {
         int offset = byteArray.Length;
@@ -146,7 +160,7 @@ public class NetworkCore : MonoBehaviour
 
     public static Int32 Unserialize_u32(ref byte[] byteArray, ref int offset)
     {
-	    Int32 value;
+        Int32 value;
 
         byte[] intByte = new byte[sizeof(Int32)];
 
@@ -162,11 +176,11 @@ public class NetworkCore : MonoBehaviour
 
         offset += sizeof(Int32);
 
-	    return value;
+        return value;
     }
-#endregion
+    #endregion
 
-#region String Serialisation
+    #region String Serialisation
     public static void SerializeString(ref byte[] byteArray, string value)
     {
         int offset = byteArray.Length;
@@ -176,7 +190,7 @@ public class NetworkCore : MonoBehaviour
 
     public static void SerializeString(ref byte[] byteArray, int offset, string value)
     {
-        Serialize_u32(ref byteArray, offset ,value.Length);
+        Serialize_u32(ref byteArray, offset, value.Length);
         offset += sizeof(int);
 
         byte[] valueByte = Encoding.ASCII.GetBytes(value);
@@ -189,11 +203,11 @@ public class NetworkCore : MonoBehaviour
 
     public static string Unserialize_str(ref byte[] byteArray, ref int offset)
     {
-	    int length = Unserialize_u32(ref byteArray, ref offset);
+        int length = Unserialize_u32(ref byteArray, ref offset);
 
         byte[] strByte = new byte[length];
 
-        for (int i = offset; i < offset+length; i++)
+        for (int i = offset; i < offset + length; i++)
         {
             strByte[i - offset] = byteArray[i];
         }
@@ -201,6 +215,20 @@ public class NetworkCore : MonoBehaviour
         offset += length;
         return Encoding.ASCII.GetString(strByte);
     }
-#endregion
+    #endregion
+
+    public static Packet build_packet(ref GeneriqueOpCode packetOpCode, PacketFlags flags)
+    {
+        // On sérialise l'opcode puis le contenu du packet dans un byte[]
+        byte[] byteArray = new byte[0];
+
+        Serialize_u32(ref byteArray, (int)(packetOpCode.opCode));
+        packetOpCode.Serialize(ref byteArray);
+
+        Packet packet = default(Packet);
+        packet.Create(byteArray, flags);
+
+        return packet;
+    }
 
 }
