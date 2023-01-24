@@ -11,7 +11,7 @@ public class C_PlayerName : GeneriqueOpCode
 
     public override void Serialize(ref byte[] byteArray)
     {
-        NetworkCore.SerializeString(ref byteArray, name);
+        NetworkCore.Serialize_str(ref byteArray, name);
     }
 
     public override void Unserialize(ref byte[] byteArray, int offset)
