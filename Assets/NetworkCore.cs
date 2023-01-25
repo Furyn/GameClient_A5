@@ -226,18 +226,18 @@ public class NetworkCore : MonoBehaviour
     public static void Serialize_str(ref byte[] byteArray, string value)
     {
         int offset = byteArray.Length;
-        Array.Resize(ref byteArray, offset + sizeof(Int32) + value.Length);
         Serialize_str(ref byteArray, offset, value);
     }
 
     public static void Serialize_str(ref byte[] byteArray, int offset, string value)
     {
-        Serialize_i32(ref byteArray, offset, value.Length);
+        byte[] valueByte = Encoding.UTF8.GetBytes(value);
+
+        Array.Resize(ref byteArray, offset + sizeof(Int32) + valueByte.Length);
+        Serialize_i32(ref byteArray, offset, valueByte.Length);
         offset += sizeof(int);
 
-        byte[] valueByte = Encoding.ASCII.GetBytes(value);
-
-        for (int i = 0; i < value.Length; i++)
+        for (int i = 0; i < valueByte.Length; i++)
         {
             byteArray[offset + i] = valueByte[i];
         }
@@ -255,7 +255,7 @@ public class NetworkCore : MonoBehaviour
         }
 
         offset += length;
-        return Encoding.ASCII.GetString(strByte);
+        return Encoding.UTF8.GetString(strByte);
     }
     #endregion
 
