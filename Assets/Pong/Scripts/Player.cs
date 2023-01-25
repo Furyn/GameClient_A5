@@ -6,6 +6,15 @@ public class Player : MonoBehaviour
 {
     public float speed = 5f;
     private float _boundaryValue = 5f;
+    public float playerNumber = 0;
+
+    private void Start()
+    {
+        if (NetworkCore.instance.playerNumber != playerNumber)
+        {
+            this.enabled = false;
+        }
+    }
 
     void Update()
     {

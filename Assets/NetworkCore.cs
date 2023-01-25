@@ -8,9 +8,17 @@ using TMPro;
 
 public class NetworkCore : MonoBehaviour
 {
-    ENet.Host m_enetHost = new ENet.Host();
-    Peer peer;
-    public TMP_InputField ipField;
+    public static NetworkCore instance;
+
+    [Header("Network")]
+    public bool isConnected = false;
+    public bool attemptToConnect = false;
+
+    private ENet.Host m_enetHost = new ENet.Host();
+    private Peer peer;
+
+    [Header("Player Value")]
+    public int playerNumber;
 
     public bool Connect(string addressString)
     {
@@ -22,6 +30,7 @@ public class NetworkCore : MonoBehaviour
 
         m_enetHost.Create(1, 0);
         peer = m_enetHost.Connect(address, 0);
+        attemptToConnect = true;
         return true;
     }
 
@@ -30,15 +39,27 @@ public class NetworkCore : MonoBehaviour
         Connect("localhost");
     }
 
-    public void ConnectWithIPInput()
+    public void ConnectWithIPInput(string ip)
     {
-        Connect(ipField.text);
+        Connect(ip);
     }
 
     public void Disconnect()
     {
         peer.Disconnect(0);
         m_enetHost.Flush();
+    }
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     // Start is called before the first frame update
@@ -74,7 +95,8 @@ public class NetworkCore : MonoBehaviour
 
                     case ENet.EventType.Connect:
                         Debug.Log("Connect");
-
+                        isConnected = true;
+                        attemptToConnect = false;
                         //SERIALISATION TEST
 
                         byte[] data = new byte[0];
@@ -89,6 +111,8 @@ public class NetworkCore : MonoBehaviour
 
                     case ENet.EventType.Disconnect:
                         Debug.Log("Disconnect");
+                        isConnected = false;
+                        attemptToConnect = false;
                         break;
 
                     case ENet.EventType.Receive:
@@ -101,6 +125,8 @@ public class NetworkCore : MonoBehaviour
                         break;
 
                     case ENet.EventType.Timeout:
+                        isConnected = false;
+                        attemptToConnect = false;
                         Debug.Log("Timeout");
                         break;
                 }
@@ -117,11 +143,19 @@ public class NetworkCore : MonoBehaviour
         switch (opcode)
         {
             case EnetOpCode.OpCode.C_PlayerName:
+            {
                 C_PlayerName playerName = new C_PlayerName();
                 playerName.Unserialize(ref dataPacket, offset);
                 Debug.Log(playerName.name);
                 break;
-
+            }
+            case EnetOpCode.OpCode.S_PlayerNumber:
+            {
+                S_PlayerNumber playerNumber = new S_PlayerNumber();
+                playerNumber.Unserialize(ref dataPacket, offset);
+                this.playerNumber = playerNumber.playerNumber;
+                break;
+            }
             default:
                 break;
         }

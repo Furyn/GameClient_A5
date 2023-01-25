@@ -5,6 +5,7 @@ namespace EnetOpCode
     public enum OpCode : Int32
     {
         C_PlayerName = 0,
+        S_PlayerNumber = 1,
     }
 }
 
