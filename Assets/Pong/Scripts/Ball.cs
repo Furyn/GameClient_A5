@@ -11,38 +11,50 @@ public class Ball : MonoBehaviour
     private float boundaryValue = 5f;
     private Vector3 direction;
 
-    [SerializeField] private Player player1;
-    [SerializeField] private Player player2;
+    private bool hasHitPlayer = false;
+    private float timeSinceHasHitPlayer = 0f;
 
     void Start()
     {
         //direction = new Vector2(Random.Range(-1f,1f), Random.Range(-1f, 1f));
-        direction = new Vector2(-1f, 0.2f);
+        direction = new Vector2(-1f, 0f);
     }
 
-    void Update()
+    public void UpdatePhysics(Player player1, Player player2, float elapsedTime)
     {
-        if(HitBoundaries(transform.position.y))
+        HitPlayer(player1);
+        HitPlayer(player2);
+        HitBoundaries();
+
+        transform.position += direction * speed * elapsedTime;
+
+        if (hasHitPlayer)
+        {
+            timeSinceHasHitPlayer += elapsedTime;
+            if (timeSinceHasHitPlayer >= 0.1f)
+            {
+                hasHitPlayer = false;
+                timeSinceHasHitPlayer = 0f;
+            }
+        }
+
+    }
+
+    private void HitBoundaries()
+    {
+        if (transform.position.y >= boundaryValue || transform.position.y <= -boundaryValue)
         {
             direction.y = -direction.y;
         }
-
-        transform.position += direction * speed * Time.deltaTime;
-
-        HitPlayer(player1, true);
-        HitPlayer(player2, false);
     }
 
-    private bool HitBoundaries(float posY)
+    private void HitPlayer(Player player)
     {
-        return transform.position.y >= boundaryValue || transform.position.y <= -boundaryValue;
-    }
-
-    private void HitPlayer(Player player, bool isPlayer1)
-    {
-        if (!(transform.position.x - player.transform.position.x < 0.25f) && isPlayer1)
+        if (hasHitPlayer)
             return;
-        if (!(transform.position.x - player.transform.position.x > -0.25f) && !isPlayer1)
+
+        float distance = transform.position.x - player.transform.position.x;
+        if ( distance > 0.25f || distance < -0.25f)
             return;
 
         // Partie centre Player 
@@ -63,5 +75,7 @@ public class Ball : MonoBehaviour
             Debug.Log("Hit high");
             direction.x = -direction.x;
         }
+
+        hasHitPlayer = true;
     }
 }

@@ -6,7 +6,12 @@ public class Player : MonoBehaviour
 {
     public float speed = 5f;
     private float _boundaryValue = 5f;
-    public float playerNumber = 0;
+
+    private bool up = false;
+    private bool down = false;
+
+    [SerializeField]
+    private int playerNumber = 0;
 
     private void Start()
     {
@@ -16,20 +21,26 @@ public class Player : MonoBehaviour
         }
     }
 
-    void Update()
+    private void Update()
     {
-        if (Input.GetKey(KeyCode.UpArrow))
+        up = Input.GetKey(KeyCode.UpArrow);
+        down = Input.GetKey(KeyCode.DownArrow);
+    }
+
+    public void UpdatePhysics(float elapsedTime)
+    {
+        if (up)
         {
             if (transform.position.y < _boundaryValue)
             {
-                transform.position += new Vector3(0f, 1, 0f) * speed * Time.deltaTime;
+                transform.position += new Vector3(0f, 1, 0f) * speed * elapsedTime;
             }
         }
-        else if (Input.GetKey(KeyCode.DownArrow))
+        else if(down)
         {
             if (transform.position.y > -_boundaryValue)
             {
-                transform.position += new Vector3(0f, -1, 0f) * speed * Time.deltaTime;
+                transform.position += new Vector3(0f, -1, 0f) * speed * elapsedTime;
             }
         }
     }
