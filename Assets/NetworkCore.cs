@@ -156,6 +156,21 @@ public class NetworkCore : MonoBehaviour
                 this.playerNumber = playerNumber.playerNumber;
                 break;
             }
+            case EnetOpCode.OpCode.S_PlayerPosition:
+                {
+                    S_PlayerPosition playerPosition = new S_PlayerPosition();
+                    playerPosition.Unserialize(ref dataPacket, offset);
+                    if(playerPosition.playerNumber == 1)
+                    {
+                        GameManager.instance.player1.SetPosition(playerPosition.playerPosX, playerPosition.playerPosY, playerPosition.inputIndex);
+
+                    }
+                    else if(playerPosition.playerNumber == 2)
+                    {
+                        GameManager.instance.player2.SetPosition(playerPosition.playerPosX, playerPosition.playerPosY, playerPosition.inputIndex);
+                    }
+                    break;
+                }
             default:
                 break;
         }

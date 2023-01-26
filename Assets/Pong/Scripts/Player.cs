@@ -44,4 +44,9 @@ public class Player : MonoBehaviour
             }
         }
     }
+
+    public void SetPosition(float posX, float posY, int inputIndex)
+    {
+        transform.position = new Vector3(posX, posY, transform.position.z);
+    }
 }

@@ -6,6 +6,8 @@ namespace EnetOpCode
     {
         C_PlayerName = 0,
         S_PlayerNumber = 1,
+        C_PlayerInput = 2,
+        S_PlayerPosition = 3,
     }
 }
 

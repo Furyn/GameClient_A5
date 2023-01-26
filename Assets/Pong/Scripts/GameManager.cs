@@ -4,18 +4,32 @@ using UnityEngine;
 
 public class GameManager : MonoBehaviour
 {
-    [SerializeField]
-    private Player player1;
+    public static GameManager instance;
 
     [SerializeField]
-    private Player player2;
+    public Player player1;
 
     [SerializeField]
-    private Ball ball;
+    public Player player2;
 
-    private float nextGameTick = 0f;
-    private float gameTickInterval = 1.0f/30f;
-    private float now = 0f;
+    [SerializeField]
+    public Ball ball;
+
+    public float nextGameTick = 0f;
+    public float gameTickInterval = 1.0f/30f;
+    public float now = 0f;
+
+    void Awake()
+    {
+        if (instance == null)
+        {
+            instance = this;
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
+    }
 
     private void Update()
     {
