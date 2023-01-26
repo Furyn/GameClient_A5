@@ -158,9 +158,13 @@ public class NetworkCore : MonoBehaviour
             }
             case EnetOpCode.OpCode.S_PlayerPosition:
                 {
+                    if (GameManager.instance == null)
+                    {
+                        return;
+                    }
                     S_PlayerPosition playerPosition = new S_PlayerPosition();
                     playerPosition.Unserialize(ref dataPacket, offset);
-                    if(playerPosition.playerNumber == 1)
+                    if(playerPosition.playerNumber == 1 )
                     {
                         GameManager.instance.player1.SetPosition(playerPosition.playerPosX, playerPosition.playerPosY, playerPosition.inputIndex);
 
@@ -320,6 +324,18 @@ public class NetworkCore : MonoBehaviour
         packet.Create(byteArray, flags);
 
         return packet;
+    }
+
+    public void SendPlayerInput(Player player)
+    {
+        byte[] data = new byte[0];
+
+        GeneriqueOpCode packet_to_send = new C_PlayerInput(player.up, player.down);
+        Packet packet = build_packet(ref packet_to_send, PacketFlags.None);
+
+        peer.Send(0, ref packet);
+
+        packet.Dispose();
     }
 
 }

@@ -7,22 +7,14 @@ public class Player : MonoBehaviour
     public float speed = 5f;
     private float _boundaryValue = 5f;
 
-    private bool up = false;
-    private bool down = false;
-
-    [SerializeField]
-    private int playerNumber = 0;
-
-    private void Start()
-    {
-        if (NetworkCore.instance.playerNumber != playerNumber)
-        {
-            this.enabled = false;
-        }
-    }
+    public bool up = false;
+    public bool down = false;
+    public bool isCurrentPlayer = false;
 
     private void Update()
     {
+        if (!isCurrentPlayer)
+            return;
         up = Input.GetKey(KeyCode.UpArrow);
         down = Input.GetKey(KeyCode.DownArrow);
     }

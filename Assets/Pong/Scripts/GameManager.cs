@@ -12,6 +12,8 @@ public class GameManager : MonoBehaviour
     [SerializeField]
     public Player player2;
 
+    private Player currentPlayer;
+
     [SerializeField]
     public Ball ball;
 
@@ -29,6 +31,17 @@ public class GameManager : MonoBehaviour
         {
             gameObject.SetActive(false);
         }
+
+        if (NetworkCore.instance.playerNumber == 1)
+        {
+            player1.isCurrentPlayer = true;
+            currentPlayer = player1;
+        }
+        else
+        {
+            player2.isCurrentPlayer = true;
+            currentPlayer = player2;
+        }
     }
 
     private void Update()
@@ -45,8 +58,9 @@ public class GameManager : MonoBehaviour
 
     private void GameTick(float elapsedTime)
     {
-        player1.UpdatePhysics(elapsedTime);
-        player2.UpdatePhysics(elapsedTime);
+        NetworkCore.instance.SendPlayerInput(currentPlayer);
+        /*player1.UpdatePhysics(elapsedTime);
+        player2.UpdatePhysics(elapsedTime);*/
         ball.UpdatePhysics(player1, player2, elapsedTime);
     }
 }
