@@ -60,7 +60,8 @@ public class GameManager : MonoBehaviour
     {
         NetworkCore.instance.SendPlayerInput(currentPlayer);
         /*player1.UpdatePhysics(elapsedTime);
-        player2.UpdatePhysics(elapsedTime);*/
+        player2.UpdatePhysics(elapsedTime);
         ball.UpdatePhysics(player1, player2, elapsedTime);
+        */
     }
 }

@@ -143,19 +143,19 @@ public class NetworkCore : MonoBehaviour
         switch (opcode)
         {
             case EnetOpCode.OpCode.C_PlayerName:
-            {
-                C_PlayerName playerName = new C_PlayerName();
-                playerName.Unserialize(ref dataPacket, offset);
-                Debug.Log(playerName.name);
-                break;
-            }
+                {
+                    C_PlayerName playerName = new C_PlayerName();
+                    playerName.Unserialize(ref dataPacket, offset);
+                    Debug.Log(playerName.name);
+                    break;
+                }
             case EnetOpCode.OpCode.S_PlayerNumber:
-            {
-                S_PlayerNumber playerNumber = new S_PlayerNumber();
-                playerNumber.Unserialize(ref dataPacket, offset);
-                this.playerNumber = playerNumber.playerNumber;
-                break;
-            }
+                {
+                    S_PlayerNumber playerNumber = new S_PlayerNumber();
+                    playerNumber.Unserialize(ref dataPacket, offset);
+                    this.playerNumber = playerNumber.playerNumber;
+                    break;
+                }
             case EnetOpCode.OpCode.S_PlayerPosition:
                 {
                     if (GameManager.instance == null)
@@ -164,15 +164,28 @@ public class NetworkCore : MonoBehaviour
                     }
                     S_PlayerPosition playerPosition = new S_PlayerPosition();
                     playerPosition.Unserialize(ref dataPacket, offset);
-                    if(playerPosition.playerNumber == 1 )
+                    if (playerPosition.playerNumber == 1)
                     {
                         GameManager.instance.player1.SetPosition(playerPosition.playerPosX, playerPosition.playerPosY, playerPosition.inputIndex);
 
                     }
-                    else if(playerPosition.playerNumber == 2)
+                    else if (playerPosition.playerNumber == 2)
                     {
                         GameManager.instance.player2.SetPosition(playerPosition.playerPosX, playerPosition.playerPosY, playerPosition.inputIndex);
                     }
+                    break;
+                }
+            case EnetOpCode.OpCode.S_BallPosition:
+                {
+                    if (GameManager.instance == null)
+                    {
+                        return;
+                    }
+                    S_BallPosition ballPosition = new S_BallPosition();
+                    ballPosition.Unserialize(ref dataPacket, offset);
+
+                    GameManager.instance.ball.SetPosition(ballPosition.ballPosX, ballPosition.ballPosY);
+
                     break;
                 }
             default:

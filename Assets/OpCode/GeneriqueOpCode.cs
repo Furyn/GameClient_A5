@@ -8,6 +8,7 @@ namespace EnetOpCode
         S_PlayerNumber = 1,
         C_PlayerInput = 2,
         S_PlayerPosition = 3,
+        S_BallPosition = 4,
     }
 }
 

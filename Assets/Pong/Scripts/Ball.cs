@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -77,5 +78,10 @@ public class Ball : MonoBehaviour
         }
 
         hasHitPlayer = true;
+    }
+
+    internal void SetPosition(float ballPosX, float ballPosY)
+    {
+        transform.position = new Vector3(ballPosX, ballPosY, transform.position.z);
     }
 }
